@@ -2,13 +2,19 @@ import streamlit as st
 import pickle
 import string
 import nltk
-nltk.download('punkt_tab')  # Downloads the standard Punkt tokenizer
 from nltk.corpus import stopwords
-
 from nltk.stem.porter import PorterStemmer
 
+# Initialize stemmer
 ps = PorterStemmer()
 
+# Download NLTK data only once
+try:
+    nltk.data.find('tokenizers/punkt')
+    nltk.data.find('corpora/stopwords')
+except LookupError:
+    nltk.download('punkt')
+    nltk.download('stopwords')
 
 def transform_text(text):
     text = text.lower()
@@ -34,15 +40,15 @@ def transform_text(text):
 
     return " ".join(y)
 
+# Load models
 tfidf = pickle.load(open('vectorizer.pkl','rb'))
 model = pickle.load(open('extratrees.pkl','rb'))
 
-st.title("Email/SMS Spam Classifier")
+st.title("QuickDetect: Your SMS SPAM Detection")
 
 input_sms = st.text_area("Enter the message")
 
 if st.button('Predict'):
-
     # 1. preprocess
     transformed_sms = transform_text(input_sms)
     # 2. vectorize
